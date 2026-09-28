@@ -452,3 +452,4 @@ Here are the most common questions external examiners ask in computer science vi
 5. **Status check**: Only `PENDING` swaps can be accepted or rejected.
 6. **Target conflict rule**: Before accepting, the system verifies that the target employee does not already have a shift scheduled on that date.
 7. **Atomic update**: Acceptance updates the roster assignment to the target employee in a single transaction (`@Transactional`).
+# JavaLeap-Project

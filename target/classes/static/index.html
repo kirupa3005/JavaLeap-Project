@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIFTPLANNER - Employee Shift & Swap Management</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #60a5fa;
+        }
+
+        .subtitle {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .auth-status {
+            background: #0f172a;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            color: #93c5fd;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        button.btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        button.btn:hover {
+            background: var(--primary-hover);
+        }
+
+        button.btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+
+        button.btn-danger {
+            background: var(--danger);
+        }
+
+        button.btn-success {
+            background: var(--success);
+        }
+
+        .log-box {
+            background: #090d16;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            min-height: 80px;
+            max-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            color: #38bdf8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .status-pill {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .status-PENDING { background: #78350f; color: #fde68a; }
+        .status-ACCEPTED { background: #064e3b; color: #a7f3d0; }
+        .status-REJECTED { background: #7f1d1d; color: #fecaca; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>SHIFTPLANNER Web Dashboard</h1>
+            <div class="subtitle">Employee Shift Roster & Shift Swap Management System</div>
+        </div>
+        <div class="auth-status" id="authStatusBox">
+            <span>Not Logged In</span>
+            <button class="btn btn-sm" onclick="showTab('tab-auth')">Login / Register</button>
+        </div>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="nav-btn active" onclick="showTab('tab-auth')">Authentication</button>
+        <button class="nav-btn" onclick="showTab('tab-shifts')">Shifts</button>
+        <button class="nav-btn" onclick="showTab('tab-rosters')">Rosters</button>
+        <button class="nav-btn" onclick="showTab('tab-swaps')">Shift Swaps</button>
+    </div>
+
+    <!-- TAB 1: AUTH -->
+    <div id="tab-auth" class="tab-panel active">
+        <div class="grid">
+            <div class="card">
+                <h2>Login</h2>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" value="manager@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" value="password123">
+                </div>
+                <button class="btn" onclick="handleLogin()">Login & Get JWT Token</button>
+            </div>
+
+            <div class="card">
+                <h2>Register New User</h2>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="e.g. Benny">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="e.g. benny@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" value="password123">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="regPhone" placeholder="9876543210">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="regRole">
+                        <option value="EMPLOYEE">EMPLOYEE</option>
+                        <option value="MANAGER">MANAGER</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="handleRegister()">Register Account</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Current Token & Server Response</h2>
+            <div class="log-box" id="authOutput">Ready. Submit login or registration above.</div>
+        </div>
+    </div>
+
+    <!-- TAB 2: SHIFTS -->
+    <div id="tab-shifts" class="tab-panel">
+        <div class="grid">
+            <div class="card">
+                <h2>Create Shift (Manager Only)</h2>
+                <div class="form-group">
+                    <label>Shift Name</label>
+                    <input type="text" id="shiftName" placeholder="e.g. Morning Shift">
+                </div>
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="text" id="shiftStart" placeholder="09:00">
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="text" id="shiftEnd" placeholder="17:00">
+                </div>
+                <button class="btn" onclick="createShift()">Save Shift</button>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h2>All Shifts</h2>
+                    <button class="btn btn-sm" onclick="loadShifts()">Refresh</button>
+                </div>
+                <table id="shiftsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Start</th>
+                            <th>End</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" style="color:var(--text-muted);">Click Refresh to load shifts.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: ROSTERS -->
+    <div id="tab-rosters" class="tab-panel">
+        <div class="grid">
+            <div class="card">
+                <h2>Assign Shift to Employee (Manager)</h2>
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="number" id="rosterEmpId" placeholder="e.g. 2">
+                </div>
+                <div class="form-group">
+                    <label>Shift ID</label>
+                    <input type="number" id="rosterShiftId" placeholder="e.g. 1">
+                </div>
+                <div class="form-group">
+                    <label>Date (YYYY-MM-DD)</label>
+                    <input type="date" id="rosterDate">
+                </div>
+                <button class="btn" onclick="createRoster()">Assign Roster</button>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h2>Roster Assignments</h2>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-sm" onclick="loadMyRosters()">My Roster</button>
+                        <button class="btn btn-sm" onclick="loadAllRosters()">All (Manager)</button>
+                    </div>
+                </div>
+                <table id="rostersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Employee</th>
+                            <th>Shift</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" style="color:var(--text-muted);">Select My Roster or All Rosters above.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: SWAPS -->
+    <div id="tab-swaps" class="tab-panel">
+        <div class="grid">
+            <div class="card">
+                <h2>Request Shift Swap</h2>
+                <div class="form-group">
+                    <label>My Roster ID</label>
+                    <input type="number" id="swapRosterId" placeholder="e.g. 1">
+                </div>
+                <div class="form-group">
+                    <label>Target Colleague Employee ID</label>
+                    <input type="number" id="swapTargetEmpId" placeholder="e.g. 3">
+                </div>
+                <div class="form-group">
+                    <label>Reason for Swap</label>
+                    <input type="text" id="swapReason" placeholder="e.g. Personal emergency">
+                </div>
+                <button class="btn" onclick="createSwap()">Submit Swap Request</button>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h2>Swap Requests</h2>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-sm" onclick="loadMySwaps()">My Swaps</button>
+                        <button class="btn btn-sm" onclick="loadAllSwaps()">All (Manager)</button>
+                    </div>
+                </div>
+                <table id="swapsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Shift / Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="6" style="color:var(--text-muted);">Select My Swaps or All Swaps.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let authToken = localStorage.getItem('shiftplanner_token') || '';
+    let currentUser = JSON.parse(localStorage.getItem('shiftplanner_user') || 'null');
+
+    function updateAuthBadge() {
+        const box = document.getElementById('authStatusBox');
+        if (authToken && currentUser) {
+            box.innerHTML = `
+                <span>Logged in as: <strong>${currentUser.email}</strong></span>
+                <span class="badge">${currentUser.role}</span>
+                <button class="btn btn-sm btn-danger" onclick="handleLogout()">Logout</button>
+            `;
+        } else {
+            box.innerHTML = `
+                <span>Not Logged In</span>
+                <button class="btn btn-sm" onclick="showTab('tab-auth')">Login / Register</button>
+            `;
+        }
+    }
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+
+        const btnIndex = ['tab-auth', 'tab-shifts', 'tab-rosters', 'tab-swaps'].indexOf(tabId);
+        if (btnIndex >= 0) {
+            document.querySelectorAll('.nav-btn')[btnIndex].classList.add('active');
+        }
+    }
+
+    async function apiRequest(url, method = 'GET', body = null) {
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) {
+            headers['Authorization'] = 'Bearer ' + authToken;
+        }
+
+        const options = { method, headers };
+        if (body) {
+            options.body = JSON.stringify(body);
+        }
+
+        try {
+            const res = await fetch(url, options);
+            const data = await res.json();
+            return { ok: res.ok, status: res.status, data };
+        } catch (err) {
+            return { ok: false, status: 0, data: { message: err.message } };
+        }
+    }
+
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        const res = await apiRequest('/api/auth/login', 'POST', { email, password });
+        document.getElementById('authOutput').innerText = JSON.stringify(res.data, null, 2);
+
+        if (res.ok && res.data.token) {
+            authToken = res.data.token;
+            localStorage.setItem('shiftplanner_token', authToken);
+
+            // Fetch profile
+            const profileRes = await apiRequest('/api/employees/me', 'GET');
+            if (profileRes.ok) {
+                currentUser = profileRes.data;
+                localStorage.setItem('shiftplanner_user', JSON.stringify(currentUser));
+            } else {
+                currentUser = { email, role: 'USER' };
+            }
+            updateAuthBadge();
+            alert('Login successful!');
+        } else {
+            alert('Login failed: ' + (res.data.message || 'Check credentials'));
+        }
+    }
+
+    async function handleRegister() {
+        const payload = {
+            name: document.getElementById('regName').value,
+            email: document.getElementById('regEmail').value,
+            password: document.getElementById('regPassword').value,
+            phone: document.getElementById('regPhone').value,
+            role: document.getElementById('regRole').value
+        };
+
+        const res = await apiRequest('/api/auth/register', 'POST', payload);
+        document.getElementById('authOutput').innerText = JSON.stringify(res.data, null, 2);
+
+        if (res.ok) {
+            alert('Registration successful! You can now log in.');
+        } else {
+            alert('Registration error: ' + (res.data.message || 'Validation failed'));
+        }
+    }
+
+    function handleLogout() {
+        authToken = '';
+        currentUser = null;
+        localStorage.removeItem('shiftplanner_token');
+        localStorage.removeItem('shiftplanner_user');
+        updateAuthBadge();
+        alert('Logged out.');
+    }
+
+    async function loadShifts() {
+        const res = await apiRequest('/api/shifts');
+        const tbody = document.querySelector('#shiftsTable tbody');
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="4" style="color:var(--danger)">${res.data.message || 'Error loading shifts'}</td></tr>`;
+            return;
+        }
+
+        if (res.data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">No shifts found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = res.data.map(s => `
+            <tr>
+                <td>#${s.id}</td>
+                <td><strong>${s.shiftName}</strong></td>
+                <td>${s.startTime}</td>
+                <td>${s.endTime}</td>
+            </tr>
+        `).join('');
+    }
+
+    async function createShift() {
+        const payload = {
+            shiftName: document.getElementById('shiftName').value,
+            startTime: document.getElementById('shiftStart').value,
+            endTime: document.getElementById('shiftEnd').value
+        };
+        const res = await apiRequest('/api/shifts', 'POST', payload);
+        if (res.ok) {
+            alert('Shift created!');
+            loadShifts();
+        } else {
+            alert('Failed: ' + (res.data.message || 'Access Denied (Requires Manager role)'));
+        }
+    }
+
+    async function loadMyRosters() {
+        const res = await apiRequest('/api/rosters/my');
+        renderRosters(res);
+    }
+
+    async function loadAllRosters() {
+        const res = await apiRequest('/api/rosters');
+        renderRosters(res);
+    }
+
+    function renderRosters(res) {
+        const tbody = document.querySelector('#rostersTable tbody');
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="4" style="color:var(--danger)">${res.data.message || 'Error loading rosters'}</td></tr>`;
+            return;
+        }
+        if (res.data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted)">No roster assignments found.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = res.data.map(r => `
+            <tr>
+                <td>#${r.id}</td>
+                <td><strong>${r.employeeName || 'ID: ' + r.employeeId}</strong> (${r.employeeEmail || ''})</td>
+                <td>${r.shiftName || 'ID: ' + r.shiftId}</td>
+                <td>${r.date}</td>
+            </tr>
+        `).join('');
+    }
+
+    async function createRoster() {
+        const payload = {
+            employeeId: parseInt(document.getElementById('rosterEmpId').value),
+            shiftId: parseInt(document.getElementById('rosterShiftId').value),
+            date: document.getElementById('rosterDate').value
+        };
+        const res = await apiRequest('/api/rosters', 'POST', payload);
+        if (res.ok) {
+            alert('Roster assigned successfully!');
+            loadAllRosters();
+        } else {
+            alert('Failed: ' + (res.data.message || 'Validation error'));
+        }
+    }
+
+    async function loadMySwaps() {
+        const res = await apiRequest('/api/swaps/my');
+        renderSwaps(res);
+    }
+
+    async function loadAllSwaps() {
+        const res = await apiRequest('/api/swaps');
+        renderSwaps(res);
+    }
+
+    function renderSwaps(res) {
+        const tbody = document.querySelector('#swapsTable tbody');
+        if (!res.ok) {
+            tbody.innerHTML = `<tr><td colspan="6" style="color:var(--danger)">${res.data.message || 'Error loading swaps'}</td></tr>`;
+            return;
+        }
+        if (res.data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted)">No swap requests found.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = res.data.map(sw => {
+            const isPending = sw.status === 'PENDING';
+            const actionHtml = isPending ? `
+                <div style="display:flex; gap:4px;">
+                    <button class="btn btn-sm btn-success" onclick="acceptSwap(${sw.id})">Accept</button>
+                    <button class="btn btn-sm btn-danger" onclick="rejectSwap(${sw.id})">Reject</button>
+                </div>
+            ` : '<span style="color:var(--text-muted); font-size:0.8rem;">Finished</span>';
+
+            return `
+                <tr>
+                    <td>#${sw.id}</td>
+                    <td>${sw.requestedByName || '#' + sw.requestedById}</td>
+                    <td>${sw.requestedToName || '#' + sw.requestedToId}</td>
+                    <td>${sw.shiftName || ''} (${sw.shiftDate || ''})</td>
+                    <td><span class="status-pill status-${sw.status}">${sw.status}</span></td>
+                    <td>${actionHtml}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function createSwap() {
+        const payload = {
+            rosterId: parseInt(document.getElementById('swapRosterId').value),
+            requestedToId: parseInt(document.getElementById('swapTargetEmpId').value),
+            reason: document.getElementById('swapReason').value
+        };
+        const res = await apiRequest('/api/swaps', 'POST', payload);
+        if (res.ok) {
+            alert('Swap requested successfully!');
+            loadMySwaps();
+        } else {
+            alert('Swap Request Failed: ' + (res.data.message || 'Error'));
+        }
+    }
+
+    async function acceptSwap(id) {
+        const res = await apiRequest(`/api/swaps/${id}/accept`, 'PUT');
+        if (res.ok) {
+            alert('Swap accepted! Roster updated.');
+            loadMySwaps();
+        } else {
+            alert('Could not accept swap: ' + (res.data.message || 'Error'));
+        }
+    }
+
+    async function rejectSwap(id) {
+        const res = await apiRequest(`/api/swaps/${id}/reject`, 'PUT');
+        if (res.ok) {
+            alert('Swap rejected.');
+            loadMySwaps();
+        } else {
+            alert('Could not reject swap: ' + (res.data.message || 'Error'));
+        }
+    }
+
+    // Set today's date in roster input by default
+    document.getElementById('rosterDate').valueAsDate = new Date();
+    updateAuthBadge();
+</script>
+</body>
+</html>
